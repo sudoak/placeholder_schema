@@ -1,10 +1,11 @@
-const express = require('express')
+const express = require('express');
 const bodyParser = require('body-parser');
-const app = express()
-const port = 3000
+const cors = require('cors');
+const app = express();
+const port = 3000;
 
 app.use(bodyParser.json());
-
+app.use(cors());
 const low = require('lowdb')
 const FileSync = require('lowdb/adapters/FileSync')
 
