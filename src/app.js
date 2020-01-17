@@ -28,6 +28,14 @@ app.get('/schema/:id', async (req,res) => {
     res.status(200).json(_);
 });
 
+app.put('/schema/:id',(req,res)=>{
+    const schmemaId = req.params.id || 1;
+    db.get('schemas')
+    .find({ id: parseInt(schmemaId) })
+    .assign({ schema : req.body.schema})
+    .write();
+    res.status(200).json(req.body);
+});
 
 app.get('/schema/v1', (req,res)=>{
     const schema = {
