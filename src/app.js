@@ -1,6 +1,7 @@
 const express = require('express');
 const bodyParser = require('body-parser');
 const cors = require('cors');
+const shortId = require('shortid');
 const app = express();
 const port = 3000;
 
@@ -48,4 +49,48 @@ app.delete('/schema/:id',(req,res) => {
     res.json({err:null, message:"Successfully Deleted"});
 });
 
+app.get('/schema/data/:id',(req,res)=>{
+    const schmemaId = req.params.id;
+    let _ = []
+    if(schmemaId){
+        _ = db.get(schmemaId)
+        .value()
+    }
+    res.json(_);
+});
+
+app.post('/schema/data',(req,res)=>{
+
+    const schmemaId = String(req.body.id) || "1";
+    req.body.id = shortId.generate();
+    const hasDbMapping = db.has(schmemaId).value()
+    if(!hasDbMapping){
+        setArraySchema(schmemaId);
+    }
+    const _= db.get(schmemaId)
+    .push(req.body)
+    .write()
+
+    res.status(200).json({err:null, message:"successfully stored", code: 200, data : req.body});
+});
+
+app.delete('/schema/data/:schemaId/:id',(req,res)=>{
+    const schmemaId = req.params.schemaId;
+    const id = req.params.id;
+    if(schmemaId,id){
+        db.get(schmemaId)
+        .remove({ id })
+        .write()
+        return res.json({err:null, message:"Successfully deleted"})
+    }
+    return res.status(400).json({err:"Bad Request"});
+});
+
 app.listen(port, () => console.log(`Example app listening on port ${port}!`))
+
+
+function setArraySchema (_) {
+    db.set(_, [])
+    .write();
+    return;
+}
